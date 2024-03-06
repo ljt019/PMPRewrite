@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import MoviePlayerPage from "@/pages/MoviePlayer";
+import MovieListPage from "@/pages/MovieList";
 
 export default function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
-      <div className="card">
-        <Button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </Button>
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<MovieListPage />} />
+          <Route path="/:movieName" element={<MoviePlayerPage />} />
+        </Routes>
+      </Router>
     </>
   );
 }
