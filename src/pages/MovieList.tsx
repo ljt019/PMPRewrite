@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import MovieCard from "@/components/common/MovieCard/MovieCard";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import AudioPlayer from "@/components/common/BackgroundAudioPlayer";
 
 const ITEMS_PER_PAGE = 3; // Adjust this to display more items per page if needed
 
@@ -38,30 +39,12 @@ export default function MovieListPage() {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: "1rem",
-          justifyContent: "center",
-          alignItems: "center",
-          maxWidth: "70rem",
-          margin: "auto",
-        }}
-      >
+      <div className="flex flex-row flex-wrap justify-center items-center gap-4 max-w-6xl mx-auto">
         {moviesToShow.map((movieName, index) => (
           <MovieCard key={index} MovieName={movieName} MovieAgeRec="PG-13" />
         ))}
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: "20px",
-        }}
-      >
+      <div className="flex justify-center items-center mt-5">
         <button
           onClick={prevPage}
           aria-label="Previous Page"
@@ -79,6 +62,9 @@ export default function MovieListPage() {
         >
           <ArrowRight size={24} />
         </button>
+      </div>
+      <div className="absolute top-4 right-4">
+        <AudioPlayer />
       </div>
     </>
   );

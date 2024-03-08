@@ -22,7 +22,7 @@ interface MovieCardProps {
 
 export default function MovieCard({ MovieName, MovieAgeRec }: MovieCardProps) {
   return (
-    <Card style={{ minWidth: "20rem" }}>
+    <Card style={{ minWidth: "20rem" }} className="rounded-xl">
       <CardHeader className="text-center pb-3 pt-3">
         <CardTitle className="pb-2">
           <MovieTitle MovieName={MovieName} />
@@ -35,7 +35,7 @@ export default function MovieCard({ MovieName, MovieAgeRec }: MovieCardProps) {
       <CardContent className="w-full pb-3">
         <MovieImage MovieName={MovieName} />
       </CardContent>
-      <CardFooter className="flex justify-center pb-1">
+      <CardFooter className="flex justify-center pb-2">
         <WatchNowButton MovieName={MovieName} />
       </CardFooter>
     </Card>
@@ -77,7 +77,11 @@ interface WatchNowButtonProps {
 export function WatchNowButton({ MovieName }: WatchNowButtonProps) {
   const navigate = useNavigate();
 
-  return <Button onClick={() => navigate(`/${MovieName}`)}>Watch Now!</Button>;
+  return (
+    <Button variant="rounded" onClick={() => navigate(`/${MovieName}`)}>
+      Watch Now!
+    </Button>
+  );
 }
 
 interface MovieInfoHoverProps {
