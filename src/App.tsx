@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import MoviePlayerPage from "@/pages/MoviePlayer";
+import FormTesting from "@/pages/FormTesting";
 import MovieListPage from "@/pages/MovieList";
 
 export default function App() {
@@ -14,3 +15,5 @@ export default function App() {
     </>
   );
 }
+
+//

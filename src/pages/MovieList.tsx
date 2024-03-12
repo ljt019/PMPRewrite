@@ -39,29 +39,31 @@ export default function MovieListPage() {
 
   return (
     <>
-      <div className="flex flex-row flex-wrap justify-center items-center gap-4 max-w-6xl mx-auto">
-        {moviesToShow.map((movieName, index) => (
-          <MovieCard key={index} MovieName={movieName} MovieAgeRec="PG-13" />
-        ))}
-      </div>
-      <div className="flex justify-center items-center mt-5">
-        <button
-          onClick={prevPage}
-          aria-label="Previous Page"
-          style={{ cursor: "pointer", border: "none", background: "none" }}
-        >
-          <ArrowLeft size={24} />
-        </button>
-        <span style={{ margin: "0 10px" }}>
-          {currentPage + 1} of {totalPages}
-        </span>
-        <button
-          onClick={nextPage}
-          aria-label="Next Page"
-          style={{ cursor: "pointer", border: "none", background: "none" }}
-        >
-          <ArrowRight size={24} />
-        </button>
+      <div className="flex flex-col justify-center items-center gap-4 max-w-6xl mx-auto min-h-screen">
+        <div className="flex flex-row flex-wrap justify-center items-center gap-4">
+          {moviesToShow.map((movieName, index) => (
+            <MovieCard key={index} MovieName={movieName} MovieAgeRec="PG-13" />
+          ))}
+        </div>
+        <div className="flex justify-center items-center mt-4">
+          <button
+            onClick={prevPage}
+            aria-label="Previous Page"
+            style={{ cursor: "pointer", border: "none", background: "none" }}
+          >
+            <ArrowLeft size={24} />
+          </button>
+          <span style={{ margin: "0 10px" }}>
+            {currentPage + 1} of {totalPages}
+          </span>
+          <button
+            onClick={nextPage}
+            aria-label="Next Page"
+            style={{ cursor: "pointer", border: "none", background: "none" }}
+          >
+            <ArrowRight size={24} />
+          </button>
+        </div>
       </div>
       <div className="absolute top-4 right-4">
         <AudioPlayer />
