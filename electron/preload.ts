@@ -1,25 +1,37 @@
 import { contextBridge, ipcRenderer } from "electron";
 
+console.log("preload running");
+
+interface saveMovieData {
+  name: string;
+  folderName: string;
+  ageRecommendation: string;
+  movieFilePath: string;
+  posterFilePath: string;
+}
+
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("electronAPI", {
   ipcRenderer: withPrototype(ipcRenderer),
+  getMovies: (folderName: string) =>
+    ipcRenderer.invoke("get-movies", folderName),
   getMovieFolders: () => ipcRenderer.invoke("get-movie-folders"),
-  saveFiles: (data: unknown) => ipcRenderer.invoke("save-files", data),
-  getMovieData: (folderName: string) =>
-    ipcRenderer.invoke("get-movie-data", folderName),
-  deleteMovieFolder: (folderName: string) =>
-    ipcRenderer.invoke("delete-movie-folder", folderName),
+  saveMovie: (data: saveMovieData) => ipcRenderer.invoke("save-movie", data),
+  deleteMovie: (folderName: string) =>
+    ipcRenderer.invoke("delete-movie", folderName),
+  getSchedule: () => ipcRenderer.invoke("get-schedule"),
   saveSchedule: (scheduleData: unknown) =>
     ipcRenderer.invoke("save-schedule", scheduleData),
+  deleteSchedule: (scheduleId: number) =>
+    ipcRenderer.invoke("delete-schedule", scheduleId),
   onNavigateToMovie: (callback: (movieName: string) => void) =>
     ipcRenderer.on("navigate-to-movie", (_event, movieName) => {
       console.log(`Received navigate-to-movie for: ${movieName}`);
       callback(movieName);
     }),
-  getSchedule: () => ipcRenderer.invoke("get-schedule"),
-  deleteSchedule: (scheduleId: number) =>
-    ipcRenderer.invoke("delete-schedule", scheduleId),
 });
+
+console.log("APIs exposed to the Renderer process:", window.electronAPI);
 
 // `exposeInMainWorld` can't detect attributes and methods of `prototype`, manually patching it.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

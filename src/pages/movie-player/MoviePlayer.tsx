@@ -5,11 +5,17 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { useEffect } from "react";
+import { turnOffLights } from "@/light-endpoints/lights";
 
 export default function MoviePlayerPage() {
   const navigate = useNavigate();
 
   const { movieName } = useParams();
+
+  useEffect(() => {
+    turnOffLights();
+  }, []);
 
   return (
     <ContextMenu>

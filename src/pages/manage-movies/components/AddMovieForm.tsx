@@ -11,6 +11,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { saveMovieData } from "@/types/movie";
+import { useSaveMovieMutation } from "@/hooks/useSaveMovieMutation";
+import { useState } from "react";
+import { LoadingButton } from "@/components/ui/loading-button";
 
 const formSchema = z.object({
   Name: z.string().min(2).max(50),
@@ -32,10 +37,8 @@ const formSchema = z.object({
 });
 
 export default function AddMovieForm({
-  refreshMovies,
   onOpenChange,
 }: {
-  refreshMovies: () => void;
   onOpenChange: (isOpen: boolean) => void;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,6 +50,12 @@ export default function AddMovieForm({
       Poster: undefined,
     },
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const saveMovie = useSaveMovieMutation();
+
+  const queryClient = useQueryClient();
 
   const movieFileRef = form.register("Movie");
   const posterFileRef = form.register("Poster");
@@ -69,22 +78,27 @@ export default function AddMovieForm({
     // Sanitize the Name for use as a folder name
     const sanitizedFolderName = Name.trim().replace(/[^a-zA-Z0-9-_]/g, "");
 
-    // Send the data to the main process
-    window.electronAPI
-      .saveFiles({
-        folderName: sanitizedFolderName,
-        ageRecommendation: AgeRec,
-        movieFilePath,
-        posterFilePath,
-      })
-      .then((response: boolean) => {
-        console.log(response); // Handle response from main process
-        refreshMovies();
-        onOpenChange(false);
-      })
-      .catch((error: Error) => {
-        console.error("Error in saving files:", error);
-      });
+    console.log("electronAPI in component:", window.electronAPI);
+
+    const data: saveMovieData = {
+      name: Name,
+      folderName: sanitizedFolderName,
+      ageRecommendation: AgeRec,
+      movieFilePath,
+      posterFilePath,
+    };
+
+    saveMovie.mutate(data, {
+      onSuccess: () => {
+        setIsSubmitting(true);
+        setTimeout(() => {
+          onOpenChange(false);
+          queryClient.invalidateQueries({ queryKey: ["movies"] });
+          form.reset();
+          setIsSubmitting(false);
+        }, 2000);
+      },
+    });
   }
 
   return (
@@ -97,7 +111,11 @@ export default function AddMovieForm({
             <FormItem>
               <FormLabel>Movie Name</FormLabel>
               <FormControl>
-                <Input placeholder="One World One Sky" {...field} />
+                <Input
+                  placeholder="One World One Sky"
+                  {...field}
+                  disabled={isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -110,7 +128,11 @@ export default function AddMovieForm({
             <FormItem>
               <FormLabel>Age Recommendation</FormLabel>
               <FormControl>
-                <Input placeholder="1st Grade" {...field} />
+                <Input
+                  placeholder="1st Grade"
+                  {...field}
+                  disabled={isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -127,6 +149,7 @@ export default function AddMovieForm({
                   className="text-gray-500"
                   type="file"
                   placeholder="shadcn"
+                  disabled={isSubmitting}
                   {...movieFileRef}
                 />
               </FormControl>
@@ -145,6 +168,7 @@ export default function AddMovieForm({
                   className="text-gray-500"
                   type="file"
                   placeholder="shadcn"
+                  disabled={isSubmitting}
                   {...posterFileRef}
                 />
               </FormControl>
@@ -153,9 +177,13 @@ export default function AddMovieForm({
           )}
         />
         <div className="flex justify-center">
-          <Button type="submit" className="w-1/2 rounded-[0.5rem]">
+          <LoadingButton
+            type="submit"
+            className="w-1/2 rounded-[0.5rem]"
+            loading={isSubmitting}
+          >
             Add Movie
-          </Button>
+          </LoadingButton>
         </div>
       </form>
     </Form>

@@ -14,31 +14,31 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { useNavigate } from "react-router-dom";
+import type { Movie } from "@/types/movie";
 
-interface MovieCardProps {
-  MovieName: string;
-  MovieAgeRec: string;
-}
-
-export default function MovieCard({ MovieName, MovieAgeRec }: MovieCardProps) {
+export default function MovieCard(movie: Movie) {
   return (
     <Card style={{ minWidth: "20rem" }} className="rounded-xl">
       <CardHeader className="text-center pb-3 pt-3">
         <CardTitle className="pb-2">
-          <MovieTitle MovieName={MovieName} />
+          <MovieTitle MovieName={movie.name} />
         </CardTitle>
         <div className="flex justify-between">
-          <Badge className="w-14 cursor-default hover:bg-primary">
-            {MovieAgeRec}
+          <Badge className="flex min-w-[2rem] cursor-default hover:bg-primary max-h-[1.25rem]">
+            {movie.ageRecommendation}
           </Badge>
-          <MovieInfoHover MovieName={MovieName} MovieAgeRec={MovieAgeRec} />
+          <MovieInfoHover
+            MovieName={movie.name}
+            MovieAgeRec={movie.ageRecommendation}
+            RunTime={movie.runTime}
+          />
         </div>
       </CardHeader>
       <CardContent className="w-full pb-3">
-        <MovieImage MovieName={MovieName} />
+        <MovieImage MovieName={movie.folderName} />
       </CardContent>
       <CardFooter className="flex justify-center pb-2">
-        <WatchNowButton MovieName={MovieName} />
+        <WatchNowButton MovieName={movie.folderName} />
       </CardFooter>
     </Card>
   );
@@ -92,11 +92,13 @@ export function WatchNowButton({ MovieName }: WatchNowButtonProps) {
 interface MovieInfoHoverProps {
   MovieName: string;
   MovieAgeRec: string;
+  RunTime: string;
 }
 
 export function MovieInfoHover({
   MovieName,
   MovieAgeRec,
+  RunTime,
 }: MovieInfoHoverProps) {
   return (
     <HoverCard>
@@ -104,8 +106,11 @@ export function MovieInfoHover({
         <Info />
       </HoverCardTrigger>
       <HoverCardContent className="rounded-[0.5rem]">
-        <p>Movie Name: {MovieName}</p>
-        <p>Movie Age Recommendation: {MovieAgeRec}</p>
+        <p className="text-lg">{MovieName}</p>
+        <p className="text-sm text-muted-foreground">
+          Age Rating: {MovieAgeRec}
+        </p>
+        <p className="text-sm text-muted-foreground">Run Time: {RunTime}</p>
       </HoverCardContent>
     </HoverCard>
   );

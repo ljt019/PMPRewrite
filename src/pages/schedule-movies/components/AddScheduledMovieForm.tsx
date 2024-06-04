@@ -18,17 +18,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGetMoviesQuery } from "@/hooks/useGetMoviesQuery";
+import { useSaveScheduleMutation } from "@/hooks/useSaveScheduleMutation";
 
 const formSchema = z.object({
-  MovieName: z.string(),
-  Time: z.string(),
+  MovieName: z.string().min(1),
+  Time: z.string().min(1),
 });
 
 export function AddScheduledMovieForm({
-  refreshSchedule,
   onOpenChange,
 }: {
-  refreshSchedule: () => void;
   onOpenChange: (isOpen: boolean) => void;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,17 +39,15 @@ export function AddScheduledMovieForm({
     },
   });
 
-  const [movies, setMovies] = useState<string[]>([]);
+  const {
+    data: movies,
+    isLoading: isMoviesLoading,
+    isError: isMoviesError,
+  } = useGetMoviesQuery();
+
+  const saveScheduledMovie = useSaveScheduleMutation();
+
   const [time, setTime] = useState({ hour: "", minute: "", ampm: "" });
-
-  useEffect(() => {
-    async function fetchMovies() {
-      const movieFolders = await window.electronAPI.getMovieFolders();
-      setMovies(movieFolders);
-    }
-
-    fetchMovies();
-  }, []);
 
   useEffect(() => {
     if (time.hour && time.minute && time.ampm) {
@@ -64,17 +62,26 @@ export function AddScheduledMovieForm({
     console.log("Movie Name: ", MovieName);
     console.log("Time: ", Time);
 
-    window.electronAPI
-      .saveSchedule({ movieName: MovieName, time: Time })
-      .then((response: boolean) => {
-        console.log(response); // Handle response from main process
-        refreshSchedule();
-        onOpenChange(false);
-      })
-      .finally(() => window.location.reload())
-      .catch((error: Error) => {
-        console.error("Error in saving schedule:", error);
-      });
+    saveScheduledMovie.mutate(
+      {
+        movieName: MovieName,
+        time: Time,
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          form.reset();
+        },
+      }
+    );
+  }
+
+  if (isMoviesLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isMoviesError || !movies) {
+    return <div>Error loading movies</div>;
   }
 
   return (
@@ -92,9 +99,9 @@ export function AddScheduledMovieForm({
                     <SelectValue placeholder="Select a movie" />
                   </SelectTrigger>
                   <SelectContent>
-                    {movies.map((movie) => (
-                      <SelectItem key={movie} value={movie}>
-                        {movie}
+                    {movies.map((movie, index) => (
+                      <SelectItem key={index} value={movie.name}>
+                        {movie.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -120,7 +127,7 @@ export function AddScheduledMovieForm({
                     <SelectTrigger>
                       <SelectValue placeholder="Hour" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[12rem]">
                       {[...Array(12).keys()].map((n) => (
                         <SelectItem
                           key={n}

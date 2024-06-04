@@ -21,29 +21,52 @@ declare namespace NodeJS {
   }
 }
 
-interface SaveFilesData {
+interface Movie {
+  id: string;
+  name: string;
+  ageRecommendation: string;
+  runTime: string;
+  creditsStart?: string;
+  folderName: string;
+  movieFilePath: string;
+  posterFilePath: string;
+}
+
+interface saveMovieData {
+  name: string;
   folderName: string;
   ageRecommendation: string;
   movieFilePath: string;
   posterFilePath: string;
 }
 
+interface ScheduledMovie {
+  id: string;
+  movieName: string;
+  time: string;
+}
+
+interface saveScheduledMovieData {
+  movieName: string;
+  time: string;
+}
+
 // Used in Renderer process, expose in `preload.ts`
 interface Window {
   ipcRenderer: import("electron").IpcRenderer;
   electronAPI: {
-    getMovieFolders: () => Promise<string[]>;
-    saveFiles: (data: SaveFilesData) => Promise<boolean>;
-    getMovieData: (folderName: string) => Promise<unknown[]>;
-    deleteMovieFolder: (folderName: string) => Promise<boolean>;
-    saveSchedule: (scheduleData: {
-      movieName: string;
-      time: string;
-    }) => Promise<boolean>;
+    // Movie Handlers
+    getMovies: () => Promise<Movie[]>;
+    getMovieFolders: () => Promise<Movie["folderName"][]>;
+    saveMovie: (data: saveMovieData) => Promise<boolean>;
+    deleteMovie: (folderName: string) => Promise<boolean>;
+
+    // Schedule Handlers
+    getSchedule: () => Promise<ScheduledMovie[]>;
+    saveSchedule: (scheduleData: saveScheduledMovieData) => Promise<boolean>;
+    deleteSchedule: (scheduleId: string) => Promise<boolean>;
+
+    // Call back to play movie at scheduled time
     onNavigateToMovie: (callback: (movieName: string) => void) => void;
-    getSchedule: () => Promise<
-      { id: number; movieName: string; time: string }[]
-    >;
-    deleteSchedule: (scheduleId: number) => Promise<boolean>;
   };
 }

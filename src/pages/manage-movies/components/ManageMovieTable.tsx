@@ -7,21 +7,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatMovieName } from "@/lib/utils";
 import { X } from "lucide-react";
 import { ActionAlertDialog } from "@/components/common/ActionAlertDialog";
 
 import type { Movie } from "@/types/movie";
+import { useDeleteMovieMutation } from "@/hooks/useDeleteMovieMutation";
 
 interface ManageMoviesTableProps {
   movies: Movie[];
-  refreshMovies: () => void;
 }
 
-export function ManageMoviesTable({
-  movies,
-  refreshMovies,
-}: ManageMoviesTableProps) {
+export function ManageMoviesTable({ movies }: ManageMoviesTableProps) {
   return (
     <Table className="text-center">
       <TableHeader>
@@ -36,15 +32,12 @@ export function ManageMoviesTable({
       <TableBody>
         {movies.map((movie, index) => (
           <TableRow key={index}>
-            <TableCell>{formatMovieName(movie.name)}</TableCell>
+            <TableCell>{movie.name}</TableCell>
             <TableCell>{movie.ageRecommendation}</TableCell>
             <TableCell>{movie.runTime}</TableCell>
             <TableCell>{movie.creditsStart}</TableCell>
             <TableCell>
-              <DeleteButton
-                folderName={movie.folderName}
-                refreshMovies={refreshMovies}
-              />
+              <DeleteButton folderName={movie.folderName} />
             </TableCell>
           </TableRow>
         ))}
@@ -53,25 +46,11 @@ export function ManageMoviesTable({
   );
 }
 
-function DeleteButton({
-  folderName,
-  refreshMovies,
-}: {
-  folderName: Movie["folderName"];
-  refreshMovies: () => void;
-}) {
-  const deleteMovie = async () => {
-    const result = await window.electronAPI.deleteMovieFolder(folderName);
-    if (result.success) {
-      console.log(`Movie folder deleted: ${folderName}`);
-      refreshMovies();
-    } else {
-      alert(`Failed to delete movie folder: ${folderName}`);
-    }
-  };
+function DeleteButton({ folderName }: { folderName: Movie["folderName"] }) {
+  const deleteMovie = useDeleteMovieMutation();
 
   return (
-    <ActionAlertDialog onClick={deleteMovie}>
+    <ActionAlertDialog onClick={() => deleteMovie.mutate(folderName)}>
       <Button
         className="text-red-500 hover:text-red-500/70"
         variant="ghostNoHover"

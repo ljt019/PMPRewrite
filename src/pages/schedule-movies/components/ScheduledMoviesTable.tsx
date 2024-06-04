@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -11,13 +10,14 @@ import {
 import { X } from "lucide-react";
 import { formatMovieName } from "@/lib/utils";
 import { ActionAlertDialog } from "@/components/common/ActionAlertDialog";
+import { useDeleteScheduleMutation } from "@/hooks/useDeleteScheduleMutation";
+
+import { ScheduledMovie } from "@/types/movie";
 
 export function ScheduledMoviesTable({
-  refreshSchedule,
   scheduledMovies,
 }: {
-  refreshSchedule: () => void;
-  scheduledMovies: { movieName: string; time: string; id: number }[];
+  scheduledMovies: ScheduledMovie[];
 }) {
   return (
     <Table className="text-center">
@@ -34,10 +34,7 @@ export function ScheduledMoviesTable({
             <TableCell>{formatMovieName(schedule.movieName)}</TableCell>
             <TableCell>{schedule.time}</TableCell>
             <TableCell>
-              <DeleteButton
-                scheduleId={schedule.id}
-                refreshSchedule={refreshSchedule}
-              />
+              <DeleteButton scheduleId={schedule.id} />
             </TableCell>
           </TableRow>
         ))}
@@ -46,25 +43,11 @@ export function ScheduledMoviesTable({
   );
 }
 
-function DeleteButton({
-  scheduleId,
-  refreshSchedule,
-}: {
-  scheduleId: number;
-  refreshSchedule: () => void;
-}) {
-  const deleteScheduledMovie = async () => {
-    const result = await window.electronAPI.deleteSchedule(scheduleId);
-    if (result.success) {
-      console.log(`Scheduled Movie deleted: ${scheduleId}`);
-      refreshSchedule();
-    } else {
-      alert(`Failed to delete scheduled movie: ${scheduleId}`);
-    }
-  };
+function DeleteButton({ scheduleId }: { scheduleId: string }) {
+  const deleteScheduledMovie = useDeleteScheduleMutation();
 
   return (
-    <ActionAlertDialog onClick={deleteScheduledMovie}>
+    <ActionAlertDialog onClick={() => deleteScheduledMovie.mutate(scheduleId)}>
       <Button
         className="text-red-500 hover:text-red-500/70"
         variant="ghostNoHover"

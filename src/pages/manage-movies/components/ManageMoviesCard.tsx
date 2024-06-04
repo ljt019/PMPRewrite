@@ -8,20 +8,17 @@ import {
 import { FilePlus } from "lucide-react";
 import { FormDialog } from "@/components/common/FormDialog";
 import { ManageMoviesTable } from "@/pages/manage-movies/components/ManageMovieTable";
-import AddMovieForm from "@/components/common/AddMovieForm";
+import AddMovieForm from "@/pages/manage-movies/components/AddMovieForm";
 import { useState } from "react";
+import { useGetMoviesQuery } from "@/hooks/useGetMoviesQuery";
 
-import type { Movie } from "@/types/movie";
+export function ManageMoviesCard() {
+  const {
+    data: movies,
+    isLoading: isMoviesLoading,
+    isError: isMoviesError,
+  } = useGetMoviesQuery();
 
-interface ManageMoviesCardProps {
-  movies: Movie[];
-  refreshMovies: () => void;
-}
-
-export function ManageMoviesCard({
-  movies,
-  refreshMovies,
-}: ManageMoviesCardProps) {
   return (
     <Card className="w-[95%] rounded-[0.5rem] min-h-[35rem]">
       <CardHeader>
@@ -33,27 +30,39 @@ export function ManageMoviesCard({
             </CardDescription>
           </div>
           <div>
-            <AddMovieButton refreshMovies={refreshMovies} />
+            <AddMovieButton />
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <ManageMoviesTable movies={movies} refreshMovies={refreshMovies} />
+        {isMoviesLoading ? (
+          <div className="flex justify-center mt-[12rem] text-2xl">
+            Loading...
+          </div>
+        ) : isMoviesError || !movies ? (
+          <div className="flex justify-center mt-[12rem] text-2xl">
+            Error loading movie data
+          </div>
+        ) : movies.length === 0 ? (
+          <div className="flex justify-center mt-[12rem] text-2xl">
+            No movies added
+          </div>
+        ) : (
+          <ManageMoviesTable movies={movies} />
+        )}
       </CardContent>
     </Card>
   );
 }
 
-function AddMovieButton({ refreshMovies }: { refreshMovies: () => void }) {
+function AddMovieButton() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
     <FormDialog
       title={"Add Movie"}
       Icon={<FilePlus />}
-      Form={
-        <AddMovieForm refreshMovies={refreshMovies} onOpenChange={setIsOpen} />
-      }
+      Form={<AddMovieForm onOpenChange={setIsOpen} />}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
     />
