@@ -4,9 +4,25 @@ import { contextBridge, ipcRenderer } from "electron";
 contextBridge.exposeInMainWorld("electronAPI", {
   ipcRenderer: withPrototype(ipcRenderer),
   getMovieFolders: () => ipcRenderer.invoke("get-movie-folders"),
+  saveFiles: (data: unknown) => ipcRenderer.invoke("save-files", data),
+  getMovieData: (folderName: string) =>
+    ipcRenderer.invoke("get-movie-data", folderName),
+  deleteMovieFolder: (folderName: string) =>
+    ipcRenderer.invoke("delete-movie-folder", folderName),
+  saveSchedule: (scheduleData: unknown) =>
+    ipcRenderer.invoke("save-schedule", scheduleData),
+  onNavigateToMovie: (callback: (movieName: string) => void) =>
+    ipcRenderer.on("navigate-to-movie", (_event, movieName) => {
+      console.log(`Received navigate-to-movie for: ${movieName}`);
+      callback(movieName);
+    }),
+  getSchedule: () => ipcRenderer.invoke("get-schedule"),
+  deleteSchedule: (scheduleId: number) =>
+    ipcRenderer.invoke("delete-schedule", scheduleId),
 });
 
 // `exposeInMainWorld` can't detect attributes and methods of `prototype`, manually patching it.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function withPrototype(obj: Record<string, any>) {
   const protos = Object.getPrototypeOf(obj);
 
@@ -15,6 +31,7 @@ function withPrototype(obj: Record<string, any>) {
 
     if (typeof value === "function") {
       // Some native APIs, like `NodeJS.EventEmitter['on']`, don't work in the Renderer process. Wrapping them into a function.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       obj[key] = function (...args: any) {
         return value.call(obj, ...args);
       };
@@ -112,6 +129,7 @@ function useLoading() {
 
 // ----------------------------------------------------------------------
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 const { appendLoading, removeLoading } = useLoading();
 domReady().then(appendLoading);
 

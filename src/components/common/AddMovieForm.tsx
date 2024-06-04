@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -12,7 +11,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const formSchema = z.object({
   Name: z.string().min(2).max(50),
@@ -33,7 +31,13 @@ const formSchema = z.object({
     ),
 });
 
-export default function AddMovieForm() {
+export default function AddMovieForm({
+  refreshMovies,
+  onOpenChange,
+}: {
+  refreshMovies: () => void;
+  onOpenChange: (isOpen: boolean) => void;
+}) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,102 +52,112 @@ export default function AddMovieForm() {
   const posterFileRef = form.register("Poster");
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    let { Name, Movie, Poster } = values;
+    const { Name, AgeRec, Movie, Poster } = values;
 
-    // Remove Spaces in Name field
-    Name = Name.replace(/\s/g, "");
+    console.log("Form Values:", values);
+    console.log("Name:", Name);
+    console.log("Age Recommendation:", AgeRec);
+    console.log("Movie:", Movie);
+    console.log("Poster:", Poster);
 
-    console.log(Name);
+    const movieFilePath = Movie?.[0]?.path;
+    const posterFilePath = Poster?.[0]?.path;
 
-    // Create folder in public/movies with the name of the movie
+    console.log("Movie File Path:", movieFilePath);
+    console.log("Poster File Path:", posterFilePath);
 
-    // Save the movie file and the poster file to the folder
-    // Files should be named {Name}.mp4 and {Name}poster.jpg respectively
+    // Sanitize the Name for use as a folder name
+    const sanitizedFolderName = Name.trim().replace(/[^a-zA-Z0-9-_]/g, "");
+
+    // Send the data to the main process
+    window.electronAPI
+      .saveFiles({
+        folderName: sanitizedFolderName,
+        ageRecommendation: AgeRec,
+        movieFilePath,
+        posterFilePath,
+      })
+      .then((response: boolean) => {
+        console.log(response); // Handle response from main process
+        refreshMovies();
+        onOpenChange(false);
+      })
+      .catch((error: Error) => {
+        console.error("Error in saving files:", error);
+      });
   }
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <Card className="w-1/2">
-        <CardHeader>
-          <CardTitle>Add Movie Form</CardTitle>{" "}
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="Name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Movie Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="One World One Sky" {...field} />
-                    </FormControl>
-                    <FormDescription>This is the Movie Name</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="AgeRec"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Age Recommendation</FormLabel>
-                    <FormControl>
-                      <Input placeholder="1st Grade" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      This is the Age Recommendation
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="Movie"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>File</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="text-gray-500"
-                        type="file"
-                        placeholder="shadcn"
-                        {...movieFileRef}
-                      />
-                    </FormControl>
-                    <FormDescription>This is the Movie File</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="Poster"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Poster</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="text-gray-500"
-                        type="file"
-                        placeholder="shadcn"
-                        {...posterFileRef}
-                      />
-                    </FormControl>
-                    <FormDescription>This is the Poster File</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button type="submit">Submit</Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="Name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Movie Name</FormLabel>
+              <FormControl>
+                <Input placeholder="One World One Sky" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="AgeRec"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Age Recommendation</FormLabel>
+              <FormControl>
+                <Input placeholder="1st Grade" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="Movie"
+          render={() => (
+            <FormItem>
+              <FormLabel>Movie File</FormLabel>
+              <FormControl>
+                <Input
+                  className="text-gray-500"
+                  type="file"
+                  placeholder="shadcn"
+                  {...movieFileRef}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="Poster"
+          render={() => (
+            <FormItem>
+              <FormLabel>Poster File</FormLabel>
+              <FormControl>
+                <Input
+                  className="text-gray-500"
+                  type="file"
+                  placeholder="shadcn"
+                  {...posterFileRef}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-center">
+          <Button type="submit" className="w-1/2 rounded-[0.5rem]">
+            Add Movie
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

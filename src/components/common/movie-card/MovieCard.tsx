@@ -28,7 +28,9 @@ export default function MovieCard({ MovieName, MovieAgeRec }: MovieCardProps) {
           <MovieTitle MovieName={MovieName} />
         </CardTitle>
         <div className="flex justify-between">
-          <Badge className="w-14">{MovieAgeRec}</Badge>
+          <Badge className="w-14 cursor-default hover:bg-primary">
+            {MovieAgeRec}
+          </Badge>
           <MovieInfoHover MovieName={MovieName} MovieAgeRec={MovieAgeRec} />
         </div>
       </CardHeader>
@@ -60,11 +62,11 @@ interface MovieImageProps {
 
 export function MovieImage({ MovieName }: MovieImageProps) {
   return (
-    <div style={{ height: "20rem" }}>
+    <div className="h-[20rem] border border-accent rounded-[0.5rem]">
       <img
         src={`/movies/${MovieName}/${MovieName}Poster.jpg`}
         alt={MovieName}
-        className="object-fill w-full h-full"
+        className="object-fill w-full h-full rounded-[0.5rem]"
       />
     </div>
   );
@@ -78,8 +80,11 @@ export function WatchNowButton({ MovieName }: WatchNowButtonProps) {
   const navigate = useNavigate();
 
   return (
-    <Button variant="rounded" onClick={() => navigate(`/${MovieName}`)}>
-      Watch Now!
+    <Button
+      className="rounded-[0.5rem] text-black"
+      onClick={() => navigate(`/${MovieName}`)}
+    >
+      Watch Now
     </Button>
   );
 }
@@ -95,10 +100,10 @@ export function MovieInfoHover({
 }: MovieInfoHoverProps) {
   return (
     <HoverCard>
-      <HoverCardTrigger>
+      <HoverCardTrigger className="text-muted-foreground hover:text-foreground">
         <Info />
       </HoverCardTrigger>
-      <HoverCardContent>
+      <HoverCardContent className="rounded-[0.5rem]">
         <p>Movie Name: {MovieName}</p>
         <p>Movie Age Recommendation: {MovieAgeRec}</p>
       </HoverCardContent>
