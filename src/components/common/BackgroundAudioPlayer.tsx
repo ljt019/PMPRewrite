@@ -2,10 +2,16 @@ import { useState, useRef, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Volume2, VolumeX } from "lucide-react";
+import { useSettings } from "@/hooks/useSettings";
+import { convertToMilliseconds } from "@/lib/utils";
 
 export function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { settings } = useSettings();
+  const audioTimeoutString = settings?.AudioTimeout || null;
+
+  const audioTimeout = convertToMilliseconds(audioTimeoutString) || 300000;
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -15,7 +21,7 @@ export function AudioPlayer() {
         audioRef.current.play();
       } else {
         audioRef.current.pause();
-        timeoutId = setTimeout(() => setIsPlaying(true), 600000);
+        timeoutId = setTimeout(() => setIsPlaying(true), audioTimeout);
       }
     }
 

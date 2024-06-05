@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useState } from "react";
+import { SettingsForm } from "./SettingsForm";
 
 export function SettingsButton() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -29,27 +30,9 @@ function SettingsDialog({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
-        <SettingsForm />
+      <DialogContent className="w-[44rem] max-w-4xl">
+        <SettingsForm onOpenChange={setIsOpen} />
       </DialogContent>
     </Dialog>
   );
 }
-
-function SettingsForm() {
-  return <div>"This is a form"</div>;
-}
-
-/* 
-Settings I Want
-
-- Change the music playing
-- Change the idle image
-- Change duration of idle image timeout
-- Change duration of audio timeout
-
-? Possible
-- Change the endpoints for the lightsOn/lightsOff
-- Change the theme (not a priority)
-
-*/

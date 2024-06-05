@@ -1,6 +1,6 @@
 import AudioPlayer from "@/components/common/BackgroundAudioPlayer";
 import { LinkButton } from "@/components/common/navbar/LinkButton";
-import { SettingsButton } from "@/components/common/navbar/Settings";
+import { SettingsButton } from "@/components/common/navbar/settings/Settings";
 
 export default function Navbar() {
   return (

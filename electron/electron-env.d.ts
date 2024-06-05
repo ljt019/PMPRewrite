@@ -66,6 +66,10 @@ interface Window {
     saveSchedule: (scheduleData: saveScheduledMovieData) => Promise<boolean>;
     deleteSchedule: (scheduleId: string) => Promise<boolean>;
 
+    // Settings Handlers
+    changeIdleImage: (filePath: string) => Promise<boolean>;
+    changeBackgroundAudio: (filePath: string) => Promise<boolean>;
+
     // Call back to play movie at scheduled time
     onNavigateToMovie: (callback: (movieName: string) => void) => void;
   };

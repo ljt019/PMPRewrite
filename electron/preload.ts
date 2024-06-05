@@ -24,6 +24,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("save-schedule", scheduleData),
   deleteSchedule: (scheduleId: number) =>
     ipcRenderer.invoke("delete-schedule", scheduleId),
+  changeIdleImage: (filePath: string) =>
+    ipcRenderer.invoke("change-idle-image", filePath),
+  changeBackgroundAudio: (filePath: string) =>
+    ipcRenderer.invoke("change-background-audio", filePath),
   onNavigateToMovie: (callback: (movieName: string) => void) =>
     ipcRenderer.on("navigate-to-movie", (_event, movieName) => {
       console.log(`Received navigate-to-movie for: ${movieName}`);

@@ -13,14 +13,45 @@ import { useEffect, useState, useCallback } from "react";
 import { turnOnLights } from "@/light-endpoints/lights";
 import useActivityDetection from "@/hooks/useActivityDetection";
 import Idle from "@/pages/idle/Idle";
-
+import { useSettings } from "@/hooks/useSettings";
+import { convertToMilliseconds } from "@/lib/utils";
 import Navbar from "@/components/common/navbar/Navbar";
-
-const IDLE_TIMEOUT = 60000; // 1 minute
 
 function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [isIdle, setIsIdle] = useState<boolean>(false);
+  const { settings, updateSettings } = useSettings();
+
+  useEffect(() => {
+    const idleTimeoutAsString = settings?.IdleTimeout;
+    const lightsOnEndpointAsString = settings?.LightsOnEndpoint;
+    const lightsOffEndpointAsString = settings?.LightsOffEndpoint;
+    const audioTimeoutAsString = settings?.AudioTimeout;
+
+    const newSettings: Partial<Settings> = {};
+
+    if (!idleTimeoutAsString) {
+      newSettings.IdleTimeout = "1:00";
+    }
+
+    if (!audioTimeoutAsString) {
+      newSettings.AudioTimeout = "5:00";
+    }
+
+    if (!lightsOnEndpointAsString) {
+      newSettings.LightsOnEndpoint = "http://192.168.1.199:8080/walkInOn";
+    }
+
+    if (!lightsOffEndpointAsString) {
+      newSettings.LightsOffEndpoint = "http://192.168.1.199:8080/walkInOff";
+    }
+
+    if (Object.keys(newSettings).length > 0) {
+      updateSettings(newSettings);
+    }
+  }, [settings, updateSettings]);
+
+  const idleTimeout = convertToMilliseconds(settings?.IdleTimeout) || 300000;
 
   useEffect(() => {
     if (!window.electronAPI || !window.electronAPI.onNavigateToMovie) {
@@ -43,8 +74,8 @@ function Layout({ children }: { children: React.ReactNode }) {
     clearTimeout(window.idleTimer);
     window.idleTimer = setTimeout(() => {
       setIsIdle(true);
-    }, IDLE_TIMEOUT);
-  }, []);
+    }, idleTimeout);
+  }, [idleTimeout]);
 
   useActivityDetection(resetIdleTimer);
 

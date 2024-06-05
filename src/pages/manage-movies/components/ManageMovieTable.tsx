@@ -25,7 +25,6 @@ export function ManageMoviesTable({ movies }: ManageMoviesTableProps) {
           <TableHead className="text-center">Movie Name</TableHead>
           <TableHead className="text-center">Age Rating</TableHead>
           <TableHead className="text-center">Run Time</TableHead>
-          <TableHead className="text-center">Credits Start</TableHead>
           <TableHead className="text-center"></TableHead>
         </TableRow>
       </TableHeader>
@@ -35,7 +34,6 @@ export function ManageMoviesTable({ movies }: ManageMoviesTableProps) {
             <TableCell>{movie.name}</TableCell>
             <TableCell>{movie.ageRecommendation}</TableCell>
             <TableCell>{movie.runTime}</TableCell>
-            <TableCell>{movie.creditsStart}</TableCell>
             <TableCell>
               <DeleteButton folderName={movie.folderName} />
             </TableCell>
