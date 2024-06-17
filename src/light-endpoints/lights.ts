@@ -1,8 +1,5 @@
 import axios from "axios";
 
-const DEFAULT_LIGHTSON_ENDPOINT = "http://192.168.1.199:8080/walkInOn";
-const DEFAULT_LIGHTSOFF_ENDPOINT = "http://192.168.1.199:8080/walkInOff";
-
 function getSettingsFromLocalStorage() {
   const settings = localStorage.getItem("appSettings");
   return settings ? JSON.parse(settings) : null;

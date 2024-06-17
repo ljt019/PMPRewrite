@@ -1,6 +1,6 @@
 import {
   useNavigate,
-  BrowserRouter as Router,
+  HashRouter as Router,
   Route,
   Routes,
 } from "react-router-dom";
@@ -16,6 +16,7 @@ import Idle from "@/pages/idle/Idle";
 import { useSettings } from "@/hooks/useSettings";
 import { convertToMilliseconds } from "@/lib/utils";
 import Navbar from "@/components/common/navbar/Navbar";
+import type { Settings } from "@/types/settings";
 
 function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -86,7 +87,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isIdle) {
       navigate("/idle");
-    } else if (window.location.pathname === "/idle") {
+    } else {
       navigate("/");
     }
   }, [isIdle, navigate]);

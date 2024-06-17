@@ -3,6 +3,8 @@ import fs from "fs";
 import path from "node:path";
 import "./ipc-handlers/ipcHandlers";
 
+import type { ScheduledMovie } from "@/types/movie";
+
 console.log("main running");
 
 // The built directory structure
@@ -60,7 +62,8 @@ function checkSchedule() {
       .toString()
       .padStart(2, "0")}:${currentMinutes} ${ampm}`;
 
-    schedules.forEach((schedule) => {
+    schedules.forEach((schedule: ScheduledMovie) => {
+      // @ts-expect-error time will always be in that format thanks to zod
       const [scheduledHours, scheduledMinutes, scheduledPeriod] = schedule.time
         .match(/(\d+):(\d+) (AM|PM)/)
         .slice(1);
@@ -71,13 +74,15 @@ function checkSchedule() {
 
       if (normalizedScheduledTime === currentTime) {
         console.log(`Navigating to movie: ${schedule.movieName}`);
-        win.webContents.send("navigate-to-movie", schedule.movieName);
+        if (win) {
+          win.webContents.send("navigate-to-movie", schedule.movieName);
+        }
       }
     });
   }
 }
 
-//setInterval(checkSchedule, 30000); // Check every minute
+setInterval(checkSchedule, 30000); // Check every minute
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

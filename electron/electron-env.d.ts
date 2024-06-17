@@ -73,4 +73,6 @@ interface Window {
     // Call back to play movie at scheduled time
     onNavigateToMovie: (callback: (movieName: string) => void) => void;
   };
+  idleTimer: ReturnType<typeof setTimeout>;
+  resourcesPath: string;
 }

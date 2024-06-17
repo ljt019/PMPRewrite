@@ -4,13 +4,17 @@ import { generateUniqueId } from "../../src/lib/utils";
 import type { Movie } from "../../src/types/movie";
 import ffmpeg from "fluent-ffmpeg";
 
-export function getVideoDurationInSeconds(videoPath: string): Promise<number> {
+function getVideoDurationInSeconds(videoPath: string): Promise<number> {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(videoPath, (err, metadata) => {
       if (err) {
         reject(err);
       } else {
-        resolve(metadata.format.duration);
+        if (metadata.format.duration !== undefined) {
+          resolve(metadata.format.duration);
+        } else {
+          reject(new Error("Duration is undefined"));
+        }
       }
     });
   });
@@ -132,7 +136,9 @@ export async function saveMovieFiles(_event: unknown, movie: Movie) {
       runTime = runTime.length === 1 ? `0${runTime}:00` : `${runTime}:00`;
       console.log(`Movie runtime calculated: ${runTime} seconds.`);
     } catch (error) {
+      // @ts-expect-error errorMessage
       console.error(`Failed to calculate movie runtime: ${error.message}`);
+      // @ts-expect-error errorMessage
       return { status: "error", message: error.message };
     }
 

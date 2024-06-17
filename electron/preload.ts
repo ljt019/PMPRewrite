@@ -33,6 +33,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
       console.log(`Received navigate-to-movie for: ${movieName}`);
       callback(movieName);
     }),
+  resourcesPath: process.resourcesPath,
 });
 
 console.log("APIs exposed to the Renderer process:", window.electronAPI);

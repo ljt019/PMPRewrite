@@ -1,10 +1,23 @@
 {
-  "name": "electron-vite-template",
+  "name": "pmp",
+  "author": "Lucien Thomas",
+  "description": "A program to play movies in the Sawyer Space Dome Planetarium",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.4",
+  "main": "dist-electron/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ljt019/PMPRewrite.git"
+  },
+  "publish": {
+    "provider": "github",
+    "owner": "ljt019",
+    "repo": "PMPRewrite",
+    "releaseType": "release"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
+    "build": "tsc && vite build && electron-builder --windows nsis",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -31,6 +44,7 @@
     "fluent-ffmpeg": "^2.1.3",
     "fs-extra": "^11.2.0",
     "get-video-duration": "^4.1.0",
+    "googleapis": "^140.0.0",
     "lucide-react": "^0.344.0",
     "million": "^3.0.6",
     "react": "^18.2.0",
@@ -62,6 +76,5 @@
     "vite": "^4.4.9",
     "vite-plugin-electron": "^0.14.0",
     "vite-plugin-electron-renderer": "^0.14.5"
-  },
-  "main": "dist-electron/main.js"
+  }
 }

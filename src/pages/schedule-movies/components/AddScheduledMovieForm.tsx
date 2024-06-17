@@ -114,7 +114,7 @@ export function AddScheduledMovieForm({
         <FormField
           control={form.control}
           name="Time"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormLabel>Time</FormLabel>
               <FormControl>

@@ -13,7 +13,9 @@ export function generateUniqueId() {
   return `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 }
 
-export function convertToMilliseconds(time: string | null): number | null {
+export function convertToMilliseconds(
+  time: string | null | undefined
+): number | null {
   if (!time) {
     return null;
   }
